@@ -4,10 +4,13 @@
 namespace App\Services;
 
 
+use App\Jobs\NotifyUserJob;
 use App\Mail\TransactionNotification;
 use App\Models\Transaction;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Queue;
 
 class TransactionService
 {
@@ -26,6 +29,7 @@ class TransactionService
 
     /**
      * @param array $data
+     *
      * @return Transaction
      */
     public function createOne(array $data): Transaction
@@ -37,9 +41,30 @@ class TransactionService
         return $transaction;
     }
 
-    public function notifyUser(Transaction $transaction, User $payer, User $payee)
+    /**
+     * @param array $data
+     * @param Transaction $transaction
+     *
+     * @return Transaction
+     */
+    public function updateOne(array $data, Transaction $transaction): Transaction
     {
-        Mail::to($payee)->send(new TransactionNotification($transaction, $payer, $payee));
+        $transaction
+            ->fill($data)
+            ->save();
+
+        return $transaction;
+
+    }
+
+    /**
+     * @param Transaction $transaction
+     * @param User $payer
+     * @param User $payee
+     */
+    public function notifyUser(Transaction $transaction, User $payer, User $payee): void
+    {
+        Queue::push(new NotifyUserJob($transaction, $payer, $payee, $this));
     }
 
 

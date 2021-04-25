@@ -6,10 +6,13 @@ namespace App\Services;
 
 use App\Mail\TransactionNotification;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Mail;
 
 class UserService
 {
+
+    private const ID_FIELD = 'id';
 
     /** @var User */
     private $model;
@@ -25,12 +28,14 @@ class UserService
 
     /**
      * @param int $id
-     * @return User|null
+     * @return \Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Builder[]|\Illuminate\Database\Eloquent\Collection|\Illuminate\Database\Eloquent\Model|null
      */
-    public function findUserById(int $id): ?User
+    public function findUserById(int $id)
     {
         $query = $this->model->newQuery();
-        return $query->find($id);
+        return $query
+            ->where(self::ID_FIELD, $id)
+            ->first();
     }
 
     /**

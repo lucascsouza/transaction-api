@@ -21,8 +21,10 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
     private $wallet_balance;
 
     protected $fillable = [
-        'name',
+        'fullname',
         'email',
+        'cpf_cnpj',
+        'type',
         'wallet_balance'
     ];
     protected $hidden = [
